@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniSync | Project Hub</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --bg: #f4f7f9;
+            --text: #333;
+            --white: #ffffff;
+            --ai-accent: #8e44ad;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar - AI & Tasks */
+        .sidebar {
+            width: 350px;
+            background: var(--white);
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+            order: 2;
+        }
+
+        /* Main Chat Area */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            order: 1;
+        }
+
+        header {
+            padding: 15px 25px;
+            background: var(--white);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+        }
+
+        .received { background: #e1e1e1; align-self: flex-start; }
+        .sent { background: var(--primary); color: white; align-self: flex-end; }
+
+        .chat-input {
+            padding: 20px;
+            background: var(--white);
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Panel Styling */
+        .panel-section {
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            color: var(--ai-accent);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .summary-box {
+            background: #f9f0ff;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            border-left: 4px solid var(--ai-accent);
+        }
+
+        .task-card {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            color: #666;
+        }
+
+        .badge {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="chat-container">
+        <header>
+            <h2>Group 4: Final Marketing Project</h2>
+        </header>
+        
+        <div class="chat-messages" id="chat">
+            <div class="message received"><b>Alex:</b> Hey everyone, I've finished the initial research. Who's handling the slides?</div>
+            <div class="message received"><b>Sarah:</b> I can do that! I'll have a draft ready by Friday.</div>
+            <div class="message received"><b>Jordan:</b> I'll take care of the data visualizations tonight.</div>
+            <div class="message sent"><b>You:</b> Awesome, I'll review everything on Saturday.</div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" placeholder="Type a message...">
+            <button>Send</button>
+        </div>
+    </main>
+
+    <aside class="sidebar">
+        <div class="panel-section">
+            <h3>✨ AI Discussion Summary</h3>
+            <div class="summary-box">
+                The group is moving into the production phase. Alex has completed the research. Sarah and Jordan have volunteered for slide creation and data viz, respectively.
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <h3>✅ Auto-Generated Tasks</h3>
+            
+            <div class="task-card">
+                <strong>Create Draft Slides</strong>
+                <div class="task-meta">
+                    <span class="badge">👤 Sarah</span>
+                    <span>📅 Mar 10</span>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <strong>Data Visualizations</strong>
+                <div class="task-meta">
+                    <span class="badge">👤 Jordan</span>
+                    <span>📅 Mar 07</span>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <strong>Final Review</strong>
+                <div class="task-meta">
+                    <span class="badge">👤 You</span>
+                    <span>📅 Mar 11</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+</body>
+</html>
