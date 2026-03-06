@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GroupSync — Project Collab</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1927;
+    --surface2: #231f35;
+    --border: #2e2a45;
+    --accent: #7c5cfc;
+    --accent2: #ff6b6b;
+    --accent3: #43e97b;
+    --accent4: #f7c948;
+    --text: #e8e6f0;
+    --muted: #7b78a0;
+    --user1: #7c5cfc;
+    --user2: #ff6b6b;
+    --user3: #43e97b;
+    --user4: #f7c948;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 58px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .project-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: .78rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .project-badge span { color: var(--text); font-weight: 600; }
+  .avatars { display: flex; gap: -4px; }
+  .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .65rem; font-weight: 700;
+    margin-left: -6px;
+    font-family: 'Syne', sans-serif;
+  }
+  .avatar:first-child { margin-left: 0; }
+
+  /* ── MAIN LAYOUT ── */
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: 1fr;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  /* ── CHAT PANEL ── */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .9rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .online-pill {
+    background: rgba(67,233,123,.12);
+    color: var(--accent3);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: .72rem;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    scroll-behavior: smooth;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg { display: flex; gap: 12px; animation: fadeUp .3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .msg-avatar {
+    width: 34px; height: 34px; min-width: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .msg-body { flex: 1; }
+  .msg-meta {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 5px;
+  }
+  .msg-name { font-weight: 600; font-size: .85rem; }
+  .msg-time { font-size: .72rem; color: var(--muted); }
+  .msg-text {
+    background: var(--surface2);
+    border-radius: 4px 14px 14px 14px;
+    padding: 10px 14px;
+    font-size: .875rem;
+    line-height: 1.55;
+    color: #d4d2e0;
+    max-width: 540px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .msg.own { flex-direction: row-reverse; }
+  .msg.own .msg-meta { flex-direction: row-reverse; }
+  .msg.own .msg-text { border-radius: 14px 4px 14px 14px; background: rgba(124,92,252,.15); border-color: rgba(124,92,252,.3); }
+
+  /* date divider */
+  .date-divider {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--muted); font-size: .72rem;
+  }
+  .date-divider::before, .date-divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* typing indicator */
+  .typing {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: .8rem;
+    padding: 4px 0;
+  }
+  .typing-dots { display: flex; gap: 4px; }
+  .typing-dots span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--muted); animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+  /* input */
+  .chat-input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    resize: none;
+    min-height: 42px;
+    max-height: 120px;
+    outline: none;
+    transition: border-color .2s;
+    line-height: 1.4;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--muted); }
+  .send-btn {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background .2s, transform .1s;
+    font-size: 1rem;
+  }
+  .send-btn:hover { background: #9370ff; transform: scale(1.05); }
+  .send-btn:active { transform: scale(.95); }
+
+  /* ── RIGHT SIDEBAR ── */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* AI Summary */
+  .summary-panel {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .summary-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ai-badge {
+    background: linear-gradient(135deg, #7c5cfc, #ff6b6b);
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: .65rem;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .06em;
+  }
+  .summary-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #7c5cfc, #ff6b6b, #43e97b);
+  }
+  .summary-text {
+    font-size: .825rem;
+    line-height: 1.6;
+    color: #c8c5d8;
+  }
+  .summary-text strong { color: var(--text); font-weight: 600; }
+  .summary-updated {
+    margin-top: 10px;
+    font-size: .7rem;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .regen-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: .7rem;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+  }
+  .regen-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Tasks panel */
+  .tasks-panel {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .tasks-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .tasks-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .task-count {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: .7rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .tasks-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tasks-list::-webkit-scrollbar { width: 4px; }
+  .tasks-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .task-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .task-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .task-card:hover { border-color: rgba(124,92,252,.4); transform: translateX(2px); }
+  .task-card.done { opacity: .55; }
+  .task-card.done .task-title { text-decoration: line-through; }
+
+  .task-top { display: flex; align-items: flex-start; gap: 10px; }
+  .task-check {
+    width: 18px; height: 18px; min-width: 18px;
+    border-radius: 5px;
+    border: 2px solid var(--border);
+    margin-top: 1px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    font-size: .65rem;
+  }
+  .task-card.done .task-check {
+    background: var(--accent3);
+    border-color: var(--accent3);
+  }
+  .task-info { flex: 1; }
+  .task-title { font-size: .84rem; font-weight: 500; line-height: 1.4; margin-bottom: 6px; }
+  .task-meta { display: flex; align-items: center; justify-content: space-between; }
+  .task-assignee {
+    display: flex; align-items: center; gap: 5px;
+    font-size: .72rem;
+  }
+  .assignee-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .task-deadline {
+    font-size: .7rem;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .deadline-soon { background: rgba(255,107,107,.15); color: var(--accent2); }
+  .deadline-ok { background: rgba(67,233,123,.1); color: var(--accent3); }
+  .deadline-mid { background: rgba(247,201,72,.1); color: var(--accent4); }
+
+  .priority-tag {
+    font-size: .65rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .priority-high { background: rgba(255,107,107,.15); color: var(--accent2); }
+  .priority-med { background: rgba(247,201,72,.12); color: var(--accent4); }
+  .priority-low { background: rgba(67,233,123,.1); color: var(--accent3); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    GroupSync
+  </div>
+  <div class="project-badge">Project: <span>Smart Campus App</span> · CS3201</div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="avatars">
+      <div class="avatar" style="background:rgba(124,92,252,.25);color:#7c5cfc">JL</div>
+      <div class="avatar" style="background:rgba(255,107,107,.25);color:#ff6b6b">AK</div>
+      <div class="avatar" style="background:rgba(67,233,123,.2);color:#43e97b">MS</div>
+      <div class="avatar" style="background:rgba(247,201,72,.2);color:#f7c948">RN</div>
+    </div>
+    <div class="online-pill"><div class="online-dot"></div>4 online</div>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="panel-header">
+      <span class="panel-title">Group Chat</span>
+      <span style="font-size:.78rem;color:var(--muted)">📌 Smart Campus App · Sprint 2</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="date-divider">Today, 10:14 AM</div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(124,92,252,.2);color:#7c5cfc">JL</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#7c5cfc">Jamie L.</span>
+            <span class="msg-time">10:14</span>
+          </div>
+          <div class="msg-text">Hey team! Quick check-in — can everyone confirm they're still on track for the wireframes? The submission deadline is Friday.</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(255,107,107,.2);color:#ff6b6b">AK</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#ff6b6b">Aisha K.</span>
+            <span class="msg-time">10:17</span>
+          </div>
+          <div class="msg-text">Yes! I've finished the login and dashboard screens. I'll send the Figma link shortly. Still need to do the map view — should be done by Thursday.</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(67,233,123,.2);color:#43e97b">MS</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#43e97b">Marcus S.</span>
+            <span class="msg-time">10:20</span>
+          </div>
+          <div class="msg-text">I'm nearly done with the backend API for room bookings. Just need to write tests. Can someone review my PR by Wednesday? It blocks Riya's frontend work.</div>
+        </div>
+      </div>
+
+      <div class="msg own">
+        <div class="msg-avatar" style="background:rgba(247,201,72,.2);color:#f7c948">RN</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#f7c948">Riya N. (you)</span>
+            <span class="msg-time">10:23</span>
+          </div>
+          <div class="msg-text">I can review the PR, Marcus! I'll block out time Wednesday afternoon. In the meantime I'll start the frontend structure so I'm ready to integrate once your API is merged.</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(124,92,252,.2);color:#7c5cfc">JL</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#7c5cfc">Jamie L.</span>
+            <span class="msg-time">10:26</span>
+          </div>
+          <div class="msg-text">Great! I'll put together the project report outline today and share it so everyone knows which sections to write. Aisha — can you add the UX justification section based on your wireframes?</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(255,107,107,.2);color:#ff6b6b">AK</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#ff6b6b">Aisha K.</span>
+            <span class="msg-time">10:28</span>
+          </div>
+          <div class="msg-text">Sure, I'll handle the UX section. Also — should we do a quick 20 min standup call tomorrow morning to sync before the Wednesday crunch?</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="msg-avatar" style="background:rgba(67,233,123,.2);color:#43e97b">MS</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#43e97b">Marcus S.</span>
+            <span class="msg-time">10:31</span>
+          </div>
+          <div class="msg-text">+1 for the standup. 9am works for me. Let's use this chat to confirm attendance.</div>
+        </div>
+      </div>
+
+      <div class="msg own">
+        <div class="msg-avatar" style="background:rgba(247,201,72,.2);color:#f7c948">RN</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-name" style="color:#f7c948">Riya N. (you)</span>
+            <span class="msg-time">10:33</span>
+          </div>
+          <div class="msg-text">9am works! See everyone there 👍</div>
+        </div>
+      </div>
+
+      <div class="typing">
+        <div class="msg-avatar" style="width:24px;height:24px;border-radius:6px;background:rgba(124,92,252,.2);color:#7c5cfc;font-size:.6rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0">JL</div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <span>Jamie is typing…</span>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chatInput" placeholder="Message the group…" rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- AI Summary -->
+    <div class="summary-panel">
+      <div class="summary-label">
+        <span>Discussion Summary</span>
+        <span class="ai-badge">AI</span>
+      </div>
+      <div class="summary-card">
+        <div class="summary-text">
+          The team is on track for <strong>Sprint 2</strong>. Aisha has completed login/dashboard wireframes and will finish the map view by <strong>Thursday</strong>. Marcus's booking API is nearly complete — Riya will review the PR <strong>Wednesday afternoon</strong>, unblocking frontend integration. Jamie is drafting the report outline and Aisha will write the UX section. A <strong>9am standup</strong> is agreed for tomorrow.
+        </div>
+        <div class="summary-updated">
+          <span>⏱ Updated just now</span>
+          <button class="regen-btn" onclick="regenSummary()">↻ Regenerate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="tasks-panel">
+      <div class="tasks-header">
+        <div class="tasks-label">
+          Auto-generated Tasks
+          <span class="task-count" id="taskCount">6</span>
+        </div>
+        <span style="font-size:.72rem;color:var(--muted)">from chat ✦</span>
+      </div>
+      <div class="tasks-list" id="tasksList">
+
+        <div class="task-card" style="--card-color:#ff6b6b" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#ff6b6b;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Complete map view wireframes</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#ff6b6b"></span> Aisha K.</span>
+                <span class="task-deadline deadline-soon">Due Thu</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-high">High</span>
+          </div>
+        </div>
+
+        <div class="task-card" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#43e97b;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Write tests for booking API</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#43e97b"></span> Marcus S.</span>
+                <span class="task-deadline deadline-soon">Due Wed</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-high">High</span>
+          </div>
+        </div>
+
+        <div class="task-card" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#f7c948;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Review Marcus's backend PR</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#f7c948"></span> Riya N.</span>
+                <span class="task-deadline deadline-soon">Due Wed</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-high">High</span>
+          </div>
+        </div>
+
+        <div class="task-card" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#7c5cfc;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Draft project report outline &amp; share with team</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#7c5cfc"></span> Jamie L.</span>
+                <span class="task-deadline deadline-mid">Due today</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-med">Med</span>
+          </div>
+        </div>
+
+        <div class="task-card" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#ff6b6b;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Write UX justification section in report</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#ff6b6b"></span> Aisha K.</span>
+                <span class="task-deadline deadline-ok">Due Fri</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-med">Med</span>
+          </div>
+        </div>
+
+        <div class="task-card" onclick="toggleTask(this)">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:#f7c948;border-radius:3px 0 0 3px"></div>
+          <div class="task-top">
+            <div class="task-check"></div>
+            <div class="task-info">
+              <div class="task-title">Begin frontend structure for room booking integration</div>
+              <div class="task-meta">
+                <span class="task-assignee"><span class="assignee-dot" style="background:#f7c948"></span> Riya N.</span>
+                <span class="task-deadline deadline-ok">Due Thu</span>
+              </div>
+            </div>
+            <span class="priority-tag priority-low">Low</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const colors = { JL:'#7c5cfc', AK:'#ff6b6b', MS:'#43e97b', RN:'#f7c948' };
+  const names  = { JL:'Jamie L.', AK:'Aisha K.', MS:'Marcus S.', RN:'Riya N. (you)' };
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    appendMsg('RN', text, true);
+    input.value = '';
+    input.style.height = 'auto';
+  }
+
+  function appendMsg(initials, text, own) {
+    const msgs = document.getElementById('messages');
+    const now = new Date();
+    const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    const div = document.createElement('div');
+    div.className = 'msg' + (own ? ' own' : '');
+    div.innerHTML = `
+      <div class="msg-avatar" style="background:${colors[initials]}22;color:${colors[initials]}">${initials}</div>
+      <div class="msg-body">
+        <div class="msg-meta">
+          <span class="msg-name" style="color:${colors[initials]}">${names[initials]}</span>
+          <span class="msg-time">${time}</span>
+        </div>
+        <div class="msg-text">${escHtml(text)}</div>
+      </div>`;
+    // insert before typing indicator
+    const typing = msgs.querySelector('.typing');
+    msgs.insertBefore(div, typing);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function toggleTask(card) {
+    card.classList.toggle('done');
+    const check = card.querySelector('.task-check');
+    check.textContent = card.classList.contains('done') ? '✓' : '';
+    updateCount();
+  }
+
+  function updateCount() {
+    const total = document.querySelectorAll('.task-card').length;
+    const done  = document.querySelectorAll('.task-card.done').length;
+    document.getElementById('taskCount').textContent = (total - done);
+  }
+
+  function regenSummary() {
+    const btn = document.querySelector('.regen-btn');
+    const card = document.querySelector('.summary-card .summary-text');
+    btn.textContent = '⏳ Thinking…';
+    btn.disabled = true;
+    setTimeout(() => {
+      card.innerHTML = `The group is progressing well on <strong>Sprint 2</strong>. Key blockers include Marcus's API tests (due <strong>Wednesday</strong>) and Riya's PR review, which gates frontend integration. Aisha is close to completing all wireframes. Jamie will share the report outline today — Aisha is assigned the UX section. The team has agreed to a <strong>9am standup tomorrow</strong> to align before the Wednesday deadline.`;
+      btn.textContent = '↻ Regenerate';
+      btn.disabled = false;
+      document.querySelector('.summary-updated span').textContent = '⏱ Updated just now';
+    }, 1400);
+  }
+
+  // auto-resize textarea
+  document.getElementById('chatInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+</script>
+</body>
+</html>
